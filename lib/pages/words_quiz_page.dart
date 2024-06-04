@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:noam_learns_english/providers/words_provider.dart';
+import 'package:noam_learns_english/widgets/flipping_card.dart';
 import 'package:noam_learns_english/widgets/rating_buttons.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -16,17 +17,59 @@ class WordsQuizPage extends StatefulWidget {
 class _WordsQuizPageState extends State<WordsQuizPage> {
   FlutterTts flutterTts = FlutterTts();
   int currentIndex = 0;
+  String? selectedColor;
 
   @override
   Widget build(BuildContext context) {
-    var textStyle = TextStyle(
-        fontSize: 32,
-        fontWeight: FontWeight.bold,
-        color: Theme.of(context).colorScheme.onBackground);
+    var buttonStyle = ElevatedButton.styleFrom(
+      shape: const CircleBorder(),
+      padding: const EdgeInsets.all(10),
+    );
+
     var wordsProvider = Provider.of<WordsProvider>(context);
     var words = wordsProvider.words;
+    if (selectedColor != null) {
+      words = selectedColor == 'all'
+          ? words
+          : words.where((word) => word.color == selectedColor).toList();
+    }
 
     var currentWord = words.isNotEmpty ? words[currentIndex] : null;
+
+    var dropdownButton = DropdownButton<String>(
+      value: selectedColor,
+      hint: const Text("Select a color"),
+      items: <String>['all', 'green', 'yellow', 'red', 'new']
+          .map((String value) {
+        Color textColor;
+        switch (value) {
+          case 'green':
+            textColor = Colors.green;
+            break;
+          case 'yellow':
+            textColor = Colors.yellow;
+            break;
+          case 'red':
+            textColor = Colors.red;
+            break;
+          case 'new':
+            textColor = Colors.black;
+            break;
+          default:
+            textColor = Colors.black;
+        }
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value, style: TextStyle(color: textColor)),
+        );
+      }).toList(),
+      onChanged: (newValue) {
+        setState(() {
+          selectedColor = newValue;
+          currentIndex = 0;
+        });
+      },
+    );
 
     return Scaffold(
       // add a button to the app bar that takes to the words bank page
@@ -44,36 +87,37 @@ class _WordsQuizPageState extends State<WordsQuizPage> {
           ),
         ],
       ),
-      body: words.isEmpty || currentWord == null
-          ? const Center(
-              child: Text(
-              'No words available.',
-              textAlign: TextAlign.center,
-            ))
-          : SafeArea(
-              child: Column(
-                children: [
-                  Expanded(
+      body: SafeArea(
+        child: Column(
+          children: words.isEmpty || currentWord == null
+              ? [
+                  dropdownButton,
+                  const Expanded(
                     child: Center(
-                      child: Card(
-                          elevation: 30,
-                          color: currentWord.color == 'green'
-                              ? Colors.green.shade100
-                              : currentWord.color == 'yellow'
-                                  ? Colors.yellow.shade100
-                                  : Colors.red.shade100,
-                          child: Padding(
-                              padding: const EdgeInsets.all(50),
-                              child: Text(currentWord.english,
-                                  style: textStyle,
-                                  textAlign: TextAlign.center))),
+                      child: Text(
+                        'No words available.',
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
-                  RatingButtons(wordsProvider: wordsProvider, currentIndex: currentIndex, currentWord: currentWord),
+                ]
+              : [
+                  dropdownButton,
+                  Expanded(
+                    child: Center(
+                      child: FlippingCard(currentWord: currentWord),
+                    ),
+                  ),
+                  RatingButtons(
+                      wordsProvider: wordsProvider,
+                      currentIndex: currentIndex,
+                      currentWord: currentWord),
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton(
+                        style: buttonStyle,
                         onPressed: () {
                           setState(() {
                             currentIndex = (currentIndex - 1) % words.length;
@@ -81,14 +125,15 @@ class _WordsQuizPageState extends State<WordsQuizPage> {
                         },
                         child: const Icon(Icons.arrow_back),
                       ),
-                      const SizedBox(width: 10),
                       ElevatedButton(
+                        style: buttonStyle,
                         onPressed: () async {
                           await flutterTts.speak(currentWord.english);
                         },
                         child: const Icon(Icons.music_note),
                       ),
                       ElevatedButton(
+                        style: buttonStyle,
                         onPressed: () {
                           setState(() {
                             currentIndex = Random().nextInt(words.length);
@@ -96,22 +141,8 @@ class _WordsQuizPageState extends State<WordsQuizPage> {
                         },
                         child: const Icon(Icons.shuffle),
                       ),
-                      const SizedBox(width: 10),
                       ElevatedButton(
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              content: Text(currentWord.hebrew,
-                                  style: textStyle,
-                                  textAlign: TextAlign.center),
-                            ),
-                          );
-                        },
-                        child: const Icon(Icons.question_mark),
-                      ),
-                      const SizedBox(width: 10),
-                      ElevatedButton(
+                        style: buttonStyle,
                         onPressed: () {
                           setState(() {
                             currentIndex = (currentIndex + 1) % words.length;
@@ -123,8 +154,8 @@ class _WordsQuizPageState extends State<WordsQuizPage> {
                   ),
                   const SizedBox(height: 40),
                 ],
-              ),
-            ),
+        ),
+      ),
     );
   }
 }

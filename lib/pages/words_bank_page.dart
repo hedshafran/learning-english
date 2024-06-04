@@ -33,7 +33,7 @@ class _WordsBankPageState extends State<WordsBankPage> {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
+            child: ListView.separated(
               itemCount: words.length,
               itemBuilder: (context, index) {
                 var word = words[index];
@@ -50,7 +50,9 @@ class _WordsBankPageState extends State<WordsBankPage> {
                       ? Colors.green.shade100
                       : word.color == 'yellow'
                           ? Colors.yellow.shade100
-                          : Colors.red.shade100,
+                          : word.color == 'red'
+                              ? Colors.red.shade100
+                              : Colors.white,
                   onTap: () {
                     _english = word.english;
                     _hebrew = word.hebrew;
@@ -63,14 +65,21 @@ class _WordsBankPageState extends State<WordsBankPage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               TextFormField(
+                                validator: (value) =>
+                                    value!.isEmpty ? 'Required' : null,
                                 initialValue: _english,
-                                decoration:
-                                    const InputDecoration(labelText: 'English'),
+                                decoration: const InputDecoration(
+                                  labelText: 'English',
+                                ),
                                 onChanged: (value) {
                                   _english = value;
                                 },
+                                textInputAction: TextInputAction.next,
                               ),
                               TextFormField(
+                                validator: (value) =>
+                                    value!.isEmpty ? 'Required' : null,
+                                textDirection: TextDirection.rtl,
                                 initialValue: _hebrew,
                                 decoration:
                                     const InputDecoration(labelText: 'Hebrew'),
@@ -79,6 +88,10 @@ class _WordsBankPageState extends State<WordsBankPage> {
                                 },
                               ),
                               const SizedBox(height: 10),
+                              RatingButtons(
+                                  wordsProvider: wordsProvider,
+                                  currentIndex: index,
+                                  currentWord: word),
                               ElevatedButton(
                                 onPressed: () {
                                   if (_formKey1.currentState!.validate()) {
@@ -93,7 +106,6 @@ class _WordsBankPageState extends State<WordsBankPage> {
                                 },
                                 child: const Text('Save'),
                               ),
-                              RatingButtons(wordsProvider: wordsProvider, currentIndex: index, currentWord: word)
                             ],
                           ),
                         ),
@@ -102,16 +114,19 @@ class _WordsBankPageState extends State<WordsBankPage> {
                   },
                 );
               },
+              separatorBuilder: (BuildContext context, int index) =>
+                  const Divider(color: Colors.grey, height: 0),
             ),
           ),
           Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                top: BorderSide(
-                    width: 1.0,
-                    color: Colors.black),
-              ),
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 5.0,
+                ),
+              ],
+              color: Theme.of(context).colorScheme.primaryContainer,
             ),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -120,18 +135,22 @@ class _WordsBankPageState extends State<WordsBankPage> {
                 child: Column(
                   children: [
                     TextFormField(
-                      decoration: const InputDecoration(labelText: 'English'),
+                      validator: (value) => value!.isEmpty ? 'Required' : null,
+                      decoration: _inputDeciration(context, 'English'),
                       onChanged: (value) {
                         _english = value;
                       },
+                      textInputAction: TextInputAction.next,
                     ),
+                    const SizedBox(height: 10),
                     TextFormField(
-                      // make the text direction right-to-left
+                      validator: (value) => value!.isEmpty ? 'Required' : null,
                       textDirection: TextDirection.rtl,
-                      decoration: const InputDecoration(labelText: 'Hebrew'),
+                      decoration: _inputDeciration(context, 'Hebrew'),
                       onChanged: (value) {
                         _hebrew = value;
                       },
+                      textInputAction: TextInputAction.done,
                     ),
                     const SizedBox(height: 10),
                     ElevatedButton(
@@ -152,6 +171,37 @@ class _WordsBankPageState extends State<WordsBankPage> {
           ),
         ],
       ),
+    );
+  }
+
+  InputDecoration _inputDeciration(BuildContext context, String labelText) {
+    return InputDecoration(
+      labelText: labelText,
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: Theme.of(context).colorScheme.primary,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: Theme.of(context).colorScheme.secondary,
+        ),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: Theme.of(context).colorScheme.error,
+        ),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      filled: true,
+      fillColor: Theme.of(context).colorScheme.secondaryContainer,
+      labelStyle: TextStyle(
+        color: Theme.of(context).colorScheme.onSecondaryContainer,
+      ),
+      contentPadding: const EdgeInsets.all(6),
     );
   }
 }

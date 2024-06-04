@@ -32,13 +32,14 @@ class RatingButtons extends StatelessWidget {
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green,
+            shape: const CircleBorder(),
+            padding: const EdgeInsets.all(10),
           ),
           child: const Icon(
             Icons.thumb_up_outlined,
             color: Colors.white,
           ),
         ),
-        const SizedBox(width: 10),
         ElevatedButton(
           onPressed: () {
             wordsProvider.updateWord(
@@ -52,13 +53,14 @@ class RatingButtons extends StatelessWidget {
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.yellow,
+            shape: const CircleBorder(),
+            padding: const EdgeInsets.all(10),
           ),
           child: const Icon(
             Icons.thumbs_up_down_outlined,
             color: Colors.white,
           ),
         ),
-        const SizedBox(width: 10),
         ElevatedButton(
           onPressed: () {
             wordsProvider.updateWord(
@@ -72,6 +74,8 @@ class RatingButtons extends StatelessWidget {
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.red,
+            shape: const CircleBorder(),
+            padding: const EdgeInsets.all(10),
           ),
           child: const Icon(
             Icons.thumb_down_outlined,
