@@ -17,6 +17,8 @@ class FlippingCard extends StatefulWidget {
 
 class _FlippingCardState extends State<FlippingCard> {
   late bool _showFrontSide;
+  bool _isAnimating = false;
+  final animationDuration = const Duration(milliseconds: 500);
 
   @override
   void initState() {
@@ -39,8 +41,15 @@ class _FlippingCardState extends State<FlippingCard> {
   }
 
   void _switchCard() {
+    if (_isAnimating) return;
     setState(() {
+      _isAnimating = true;
       _showFrontSide = !_showFrontSide;
+    });
+    Future.delayed(animationDuration, () {
+      setState(() {
+        _isAnimating = false;
+      });
     });
   }
 
@@ -56,9 +65,9 @@ class _FlippingCardState extends State<FlippingCard> {
 
   Widget _buildFlipAnimation() {
     return GestureDetector(
-      onTap: _switchCard,
+      onTap: _isAnimating ? null : _switchCard,
       child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 500),
+        duration: animationDuration,
         transitionBuilder: __transitionBuilder,
         layoutBuilder: (widget, list) => Stack(children: [widget!, ...list]),
         switchInCurve: Curves.easeInBack,
