@@ -54,11 +54,11 @@ class _FlippingCardState extends State<FlippingCard> {
   }
 
   Color getCardColor() {
-    return widget.currentWord!.color == 'green'
+    return widget.currentWord!.color == WordColor.green
         ? Colors.green.shade100
-        : widget.currentWord!.color == 'yellow'
+        : widget.currentWord!.color == WordColor.yellow
             ? Colors.yellow.shade100
-            : widget.currentWord!.color == 'red'
+            : widget.currentWord!.color == WordColor.red
                 ? Colors.red.shade100
                 : Colors.white;
   }
@@ -86,8 +86,13 @@ class _FlippingCardState extends State<FlippingCard> {
         borderRadius: BorderRadius.circular(20),
         color: getCardColor(),
       ),
-      child: Center(
-        child: Text(faceName, style: const TextStyle(fontSize: 40)),
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Center(
+          child: Text(faceName,
+              style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center),
+        ),
       ),
     );
   }

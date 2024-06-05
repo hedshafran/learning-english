@@ -6,12 +6,10 @@ class RatingButtons extends StatelessWidget {
   const RatingButtons({
     super.key,
     required this.wordsProvider,
-    required this.currentIndex,
     required this.currentWord,
   });
 
   final WordsProvider wordsProvider;
-  final int currentIndex;
   final Word currentWord;
 
   @override
@@ -22,11 +20,11 @@ class RatingButtons extends StatelessWidget {
         ElevatedButton(
           onPressed: () {
             wordsProvider.updateWord(
-              currentIndex,
+              currentWord.english,
               Word(
                 english: currentWord.english,
                 hebrew: currentWord.hebrew,
-                color: 'green',
+                color: WordColor.green,
               ),
             );
           },
@@ -43,11 +41,11 @@ class RatingButtons extends StatelessWidget {
         ElevatedButton(
           onPressed: () {
             wordsProvider.updateWord(
-              currentIndex,
+              currentWord.english,
               Word(
                 english: currentWord.english,
                 hebrew: currentWord.hebrew,
-                color: 'yellow',
+                color: WordColor.yellow,
               ),
             );
           },
@@ -64,11 +62,11 @@ class RatingButtons extends StatelessWidget {
         ElevatedButton(
           onPressed: () {
             wordsProvider.updateWord(
-              currentIndex,
+              currentWord.english,
               Word(
                 english: currentWord.english,
                 hebrew: currentWord.hebrew,
-                color: 'red',
+                color: WordColor.red,
               ),
             );
           },

@@ -1,6 +1,5 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:noam_learns_english/models/word.dart';
 import 'package:noam_learns_english/providers/words_provider.dart';
 import 'package:noam_learns_english/widgets/flipping_card.dart';
 import 'package:noam_learns_english/widgets/rating_buttons.dart';
@@ -16,8 +15,6 @@ class WordsQuizPage extends StatefulWidget {
 
 class _WordsQuizPageState extends State<WordsQuizPage> {
   FlutterTts flutterTts = FlutterTts();
-  int currentIndex = 0;
-  String? selectedColor;
 
   @override
   Widget build(BuildContext context) {
@@ -27,52 +24,34 @@ class _WordsQuizPageState extends State<WordsQuizPage> {
     );
 
     var wordsProvider = Provider.of<WordsProvider>(context);
-    var words = wordsProvider.words;
-    if (selectedColor != null) {
-      words = selectedColor == 'all'
-          ? words
-          : words.where((word) => word.color == selectedColor).toList();
-    }
-
-    var currentWord = words.isNotEmpty ? words[currentIndex] : null;
+    Word? currentWord = wordsProvider.currentWord;
+    var words = wordsProvider.filteredWords;
 
     var dropdownButton = DropdownButton<String>(
-      value: selectedColor,
+      value: wordsProvider.selectedColor.value,
       hint: const Text("Select a color"),
-      items: <String>['all', 'green', 'yellow', 'red', 'new']
-          .map((String value) {
-        Color textColor;
-        switch (value) {
-          case 'green':
-            textColor = Colors.green;
-            break;
-          case 'yellow':
-            textColor = Colors.yellow;
-            break;
-          case 'red':
-            textColor = Colors.red;
-            break;
-          case 'new':
-            textColor = Colors.black;
-            break;
-          default:
-            textColor = Colors.black;
-        }
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value, style: TextStyle(color: textColor)),
-        );
-      }).toList(),
+      items: WordColor.values
+          .map((color) => DropdownMenuItem(
+                value: color.value,
+                child: Text(color.name,
+                    style: TextStyle(
+                        color: color == WordColor.green
+                            ? Colors.green
+                            : color == WordColor.yellow
+                                ? Colors.yellow
+                                : color == WordColor.red
+                                    ? Colors.red
+                                    : Colors.black)),
+              ))
+          .toList(),
       onChanged: (newValue) {
-        setState(() {
-          selectedColor = newValue;
-          currentIndex = 0;
-        });
+        wordsProvider.selectedColor = WordColor.values.firstWhere(
+            (color) => color.value == newValue,
+            orElse: () => WordColor.all);
       },
     );
 
     return Scaffold(
-      // add a button to the app bar that takes to the words bank page
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text('Words Quiz',
@@ -109,9 +88,7 @@ class _WordsQuizPageState extends State<WordsQuizPage> {
                     ),
                   ),
                   RatingButtons(
-                      wordsProvider: wordsProvider,
-                      currentIndex: currentIndex,
-                      currentWord: currentWord),
+                      wordsProvider: wordsProvider, currentWord: currentWord),
                   const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -120,7 +97,7 @@ class _WordsQuizPageState extends State<WordsQuizPage> {
                         style: buttonStyle,
                         onPressed: () {
                           setState(() {
-                            currentIndex = (currentIndex - 1) % words.length;
+                            wordsProvider.previousWord();
                           });
                         },
                         child: const Icon(Icons.arrow_back),
@@ -136,7 +113,7 @@ class _WordsQuizPageState extends State<WordsQuizPage> {
                         style: buttonStyle,
                         onPressed: () {
                           setState(() {
-                            currentIndex = Random().nextInt(words.length);
+                            wordsProvider.randomizeWords();
                           });
                         },
                         child: const Icon(Icons.shuffle),
@@ -145,7 +122,7 @@ class _WordsQuizPageState extends State<WordsQuizPage> {
                         style: buttonStyle,
                         onPressed: () {
                           setState(() {
-                            currentIndex = (currentIndex + 1) % words.length;
+                            wordsProvider.nextWord();
                           });
                         },
                         child: const Icon(Icons.arrow_forward),
