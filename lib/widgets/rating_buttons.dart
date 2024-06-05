@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:noam_learns_english/models/word.dart';
 import 'package:noam_learns_english/providers/words_provider.dart';
+import 'package:noam_learns_english/widgets/scale_transition_button.dart';
 
 class RatingButtons extends StatelessWidget {
   const RatingButtons({
@@ -17,7 +18,7 @@ class RatingButtons extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        ElevatedButton(
+        ScaleTransitionButton(
           onPressed: () {
             wordsProvider.updateWord(
               currentWord.english,
@@ -38,7 +39,7 @@ class RatingButtons extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        ElevatedButton(
+        ScaleTransitionButton(
           onPressed: () {
             wordsProvider.updateWord(
               currentWord.english,
@@ -59,7 +60,7 @@ class RatingButtons extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        ElevatedButton(
+        ScaleTransitionButton(
           onPressed: () {
             wordsProvider.updateWord(
               currentWord.english,

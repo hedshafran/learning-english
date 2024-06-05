@@ -3,6 +3,7 @@ import 'package:noam_learns_english/models/word.dart';
 import 'package:noam_learns_english/providers/words_provider.dart';
 import 'package:noam_learns_english/widgets/flipping_card.dart';
 import 'package:noam_learns_english/widgets/rating_buttons.dart';
+import 'package:noam_learns_english/widgets/scale_transition_button.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
@@ -12,11 +13,6 @@ class WordsQuizPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     FlutterTts flutterTts = FlutterTts();
-
-    var buttonStyle = ElevatedButton.styleFrom(
-      shape: const CircleBorder(),
-      padding: const EdgeInsets.all(10),
-    );
 
     var wordsProvider = Provider.of<WordsProvider>(context);
     Word? currentWord = wordsProvider.currentWord;
@@ -46,6 +42,25 @@ class WordsQuizPage extends StatelessWidget {
       },
     );
 
+    Color backgroundColor;
+    switch (wordsProvider.selectedColor) {
+      case WordColor.green:
+        backgroundColor = Colors.green.shade100;
+        break;
+      case WordColor.yellow:
+        backgroundColor = Colors.yellow.shade100;
+        break;
+      case WordColor.red:
+        backgroundColor = Colors.red.shade100;
+        break;
+      case WordColor.newWord:
+        backgroundColor = Colors.grey.shade300;
+        break;
+      case WordColor.all:
+        backgroundColor = Colors.grey.shade100;
+        break;
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -62,57 +77,58 @@ class WordsQuizPage extends StatelessWidget {
         ],
       ),
       body: SafeArea(
-        child: Column(
-          children: words.isEmpty || currentWord == null
-              ? [
-                  dropdownButton,
-                  const Expanded(
-                    child: Center(
-                      child: Text(
-                        'No words available.',
-                        textAlign: TextAlign.center,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 500),
+          color: backgroundColor,
+          child: Column(
+            children: words.isEmpty || currentWord == null
+                ? [
+                    dropdownButton,
+                    const Expanded(
+                      child: Center(
+                        child: Text(
+                          'No words available.',
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ),
-                  ),
-                ]
-              : [
-                  dropdownButton,
-                  Expanded(
-                    child: Center(
-                      child: FlippingCard(currentWord: currentWord),
+                  ]
+                : [
+                    dropdownButton,
+                    Expanded(
+                      child: Center(
+                        child: FlippingCard(currentWord: currentWord),
+                      ),
                     ),
-                  ),
-                  RatingButtons(
-                      wordsProvider: wordsProvider, currentWord: currentWord),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        style: buttonStyle,
-                        onPressed: () {
-                          wordsProvider.previousWord();
-                        },
-                        child: const Icon(Icons.arrow_back),
-                      ),
-                      ElevatedButton(
-                        style: buttonStyle,
-                        onPressed: () async {
-                          await flutterTts.speak(currentWord.english);
-                        },
-                        child: const Icon(Icons.music_note),
-                      ),
-                      ElevatedButton(
-                        style: buttonStyle,
-                        onPressed: () {
-                          wordsProvider.nextWord();
-                        },
-                        child: const Icon(Icons.arrow_forward),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-                ],
+                    RatingButtons(
+                        wordsProvider: wordsProvider, currentWord: currentWord),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ScaleTransitionButton(
+                          onPressed: () {
+                            wordsProvider.previousWord();
+                          },
+                          child: const Icon(Icons.arrow_back),
+                        ),
+                        ScaleTransitionButton(
+                          onPressed: () async {
+                            await flutterTts.speak(currentWord.english);
+                          },
+                          child: const Icon(Icons.music_note),
+                        ),
+                        ScaleTransitionButton(
+                          onPressed: () {
+                            wordsProvider.nextWord();
+                          },
+                          child: const Icon(Icons.arrow_forward),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 40),
+                  ],
+          ),
         ),
       ),
     );

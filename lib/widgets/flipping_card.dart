@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:noam_learns_english/models/word.dart';
 
@@ -55,11 +54,11 @@ class _FlippingCardState extends State<FlippingCard> {
 
   Color getCardColor() {
     return widget.currentWord!.color == WordColor.green
-        ? Colors.green.shade100
+        ? Colors.green.shade300
         : widget.currentWord!.color == WordColor.yellow
-            ? Colors.yellow.shade100
+            ? Colors.yellow.shade300
             : widget.currentWord!.color == WordColor.red
-                ? Colors.red.shade100
+                ? Colors.red.shade300
                 : Colors.white;
   }
 
@@ -85,6 +84,14 @@ class _FlippingCardState extends State<FlippingCard> {
         shape: BoxShape.rectangle,
         borderRadius: BorderRadius.circular(20),
         color: getCardColor(),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 3,
+            blurRadius: 20,
+            offset: const Offset(0, 15),
+          ),
+        ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(8),
