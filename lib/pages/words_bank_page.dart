@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:noam_learns_english/models/word.dart';
 import 'package:noam_learns_english/providers/words_provider.dart';
-import 'package:noam_learns_english/widgets/rating_buttons.dart';
 import 'package:provider/provider.dart';
 
 class WordsBankPage extends StatefulWidget {
@@ -30,6 +28,14 @@ class _WordsBankPageState extends State<WordsBankPage> {
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text('Words',
             style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.shuffle),
+            onPressed: () {
+              wordsProvider.randomizeWords();
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [

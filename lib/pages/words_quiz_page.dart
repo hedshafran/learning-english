@@ -6,18 +6,13 @@ import 'package:noam_learns_english/widgets/rating_buttons.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
-class WordsQuizPage extends StatefulWidget {
+class WordsQuizPage extends StatelessWidget {
   const WordsQuizPage({super.key});
 
   @override
-  State<WordsQuizPage> createState() => _WordsQuizPageState();
-}
-
-class _WordsQuizPageState extends State<WordsQuizPage> {
-  FlutterTts flutterTts = FlutterTts();
-
-  @override
   Widget build(BuildContext context) {
+    FlutterTts flutterTts = FlutterTts();
+
     var buttonStyle = ElevatedButton.styleFrom(
       shape: const CircleBorder(),
       padding: const EdgeInsets.all(10),
@@ -96,9 +91,7 @@ class _WordsQuizPageState extends State<WordsQuizPage> {
                       ElevatedButton(
                         style: buttonStyle,
                         onPressed: () {
-                          setState(() {
-                            wordsProvider.previousWord();
-                          });
+                          wordsProvider.previousWord();
                         },
                         child: const Icon(Icons.arrow_back),
                       ),
@@ -112,18 +105,7 @@ class _WordsQuizPageState extends State<WordsQuizPage> {
                       ElevatedButton(
                         style: buttonStyle,
                         onPressed: () {
-                          setState(() {
-                            wordsProvider.randomizeWords();
-                          });
-                        },
-                        child: const Icon(Icons.shuffle),
-                      ),
-                      ElevatedButton(
-                        style: buttonStyle,
-                        onPressed: () {
-                          setState(() {
-                            wordsProvider.nextWord();
-                          });
+                          wordsProvider.nextWord();
                         },
                         child: const Icon(Icons.arrow_forward),
                       ),
