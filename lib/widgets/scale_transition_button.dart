@@ -46,7 +46,7 @@ class _ScaleTransitionButtonState extends State<ScaleTransitionButton>
       child: ElevatedButton(
         style: widget.style ?? ElevatedButton.styleFrom(
           shape: const CircleBorder(),
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(20),
         ),
         onPressed: () {
           widget.onPressed?.call();

@@ -112,12 +112,14 @@ class WordsQuizPage extends StatelessWidget {
                           },
                           child: const Icon(Icons.arrow_back),
                         ),
+                        const SizedBox(width: 20),
                         ScaleTransitionButton(
                           onPressed: () async {
                             await flutterTts.speak(currentWord.english);
                           },
                           child: const Icon(Icons.music_note),
                         ),
+                        const SizedBox(width: 20),
                         ScaleTransitionButton(
                           onPressed: () {
                             wordsProvider.nextWord();

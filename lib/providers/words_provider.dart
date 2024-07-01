@@ -6,51 +6,32 @@ import 'dart:convert';
 
 class WordsProvider with ChangeNotifier {
   Word? _currentWord;
+  WordColor _selectedColor = WordColor.all;
+  List<Word> _words = [];
+  List<Word> _filteredWords = [];
 
   Word? get currentWord => _currentWord;
+  WordColor get selectedColor => _selectedColor;
+  List<Word> get words => _words;
+  List<Word> get filteredWords => _filteredWords;
 
   set currentWord(Word? word) {
     _currentWord = word;
     notifyListeners();
   }
 
-  WordColor _selectedColor = WordColor.all;
-
-  WordColor get selectedColor => _selectedColor;
-
   set selectedColor(WordColor color) {
     _selectedColor = color;
-    switch (color) {
-      case WordColor.green:
-        _filteredWords = _words.where((word) => word.color == WordColor.green).toList();
-        break;
-      case WordColor.yellow:
-        _filteredWords = _words.where((word) => word.color == WordColor.yellow).toList();
-        break;
-      case WordColor.red:
-        _filteredWords = _words.where((word) => word.color == WordColor.red).toList();
-        break;
-      case WordColor.newWord:
-        _filteredWords = _words.where((word) => word.color == WordColor.newWord).toList();
-        break;
-      case WordColor.all:
-        _filteredWords = _words;
-        break;
-    }
+    _filteredWords = _words
+        .where((word) => color == WordColor.all || word.color == color)
+        .toList();
     _currentWord = _filteredWords.isNotEmpty ? _filteredWords[0] : _currentWord;
     notifyListeners();
   }
 
-  List<Word> _words = [];
-
-  List<Word> get words => _words;
-
-  List<Word> _filteredWords = [];
-
-  List<Word> get filteredWords => _filteredWords;
-
   void nextWord() {
-    int index = _filteredWords.indexWhere((word) => word.english == _currentWord!.english);
+    int index = _filteredWords
+        .indexWhere((word) => word.english == _currentWord!.english);
     if (index == _filteredWords.length - 1) {
       _currentWord = _filteredWords[0];
     } else {
@@ -60,7 +41,8 @@ class WordsProvider with ChangeNotifier {
   }
 
   void previousWord() {
-    int index = _filteredWords.indexWhere((word) => word.english == _currentWord!.english);
+    int index = _filteredWords
+        .indexWhere((word) => word.english == _currentWord!.english);
     if (index == 0) {
       _currentWord = _filteredWords[_filteredWords.length - 1];
     } else {
@@ -77,50 +59,64 @@ class WordsProvider with ChangeNotifier {
 
   void updateWord(String englishValue, Word word) {
     int index = _words.indexWhere((element) => element.english == englishValue);
-    _words[index] = word;
-    int filteredIndex = _filteredWords.indexWhere((element) => element.english == englishValue);
-    if (filteredIndex != -1) {
-      _filteredWords[filteredIndex] = word;
+    if (index != -1) {
+      _words[index] = word;
+      int filteredIndex = _filteredWords
+          .indexWhere((element) => element.english == englishValue);
+      if (filteredIndex != -1) {
+        _filteredWords[filteredIndex] = word;
+      }
+      if (_currentWord?.english == englishValue) {
+        _currentWord = word;
+      }
+      notifyListeners();
+      saveWords();
+    } else {
+      // Handle error: English value not found
     }
-    if (_currentWord!.english == englishValue) {
-      _currentWord = word;
-    }
-    notifyListeners();
-    saveWords();
   }
 
   void saveWords() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> wordsJson = _words
-        .map((word) => jsonEncode({
-              'english': word.english,
-              'hebrew': word.hebrew,
-              'color': word.color.name,
-            }))
-        .toList();
-    await prefs.setStringList('words', wordsJson);
+    prefs.setStringList(
+        'words',
+        _words
+            .map((word) => jsonEncode({
+                  'english': word.english,
+                  'hebrew': word.hebrew,
+                  'color': word.color.name,
+                }))
+            .toList());
   }
 
   void loadWords() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String>? wordsJson = prefs.getStringList('words');
-    if (wordsJson != null) {
-      _words = wordsJson.map((wordJson) {
-        var wordMap = jsonDecode(wordJson);
-        return Word(
-          english: wordMap['english'],
-          hebrew: wordMap['hebrew'],
-          color: WordColor.values.firstWhere((color) => color.name == wordMap['color']),
-        );
-      }).toList();
-      _filteredWords = _words;
-      _currentWord = _filteredWords[0];
-      notifyListeners();
-    }
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      List<String>? wordsJson = prefs.getStringList('words');
+      if (wordsJson != null) {
+        _words = wordsJson.map((wordJson) {
+          var wordMap = jsonDecode(wordJson);
+          return Word(
+            english: wordMap['english'],
+            hebrew: wordMap['hebrew'],
+            color: WordColor.values
+                .firstWhere((color) => color.name == wordMap['color']),
+          );
+        }).toList();
+        _filteredWords = _words;
+      }
 
-    if (_words.isEmpty) {
-      _words = defaultWords;
-      saveWords();
+      if (_words.isEmpty) {
+        _words = defaultWords;
+        _filteredWords = _words;
+        saveWords();
+      }
+
+      _selectedColor = WordColor.all;
+      _currentWord = _filteredWords.isNotEmpty ? _filteredWords[0] : null;
+      notifyListeners();
+    } catch (e) {
+      // Handle error loading words
     }
   }
 
@@ -132,6 +128,11 @@ class WordsProvider with ChangeNotifier {
 
   void randomizeWords() {
     _words.shuffle();
+    notifyListeners();
+  }
+
+  void sortWords() {
+    _words.sort((a, b) => a.english.compareTo(b.english));
     notifyListeners();
   }
 }

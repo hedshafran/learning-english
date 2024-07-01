@@ -30,6 +30,12 @@ class _WordsBankPageState extends State<WordsBankPage> {
             style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
         actions: [
           IconButton(
+            icon: const Icon(Icons.sort_by_alpha),
+            onPressed: () {
+              wordsProvider.sortWords();
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.shuffle),
             onPressed: () {
               wordsProvider.randomizeWords();
@@ -102,6 +108,7 @@ class _WordsBankPageState extends State<WordsBankPage> {
                                       padding: const EdgeInsets.all(10),
                                     ),
                                     onPressed: () {
+                                      wordsProvider.selectedColor = WordColor.all;
                                       wordsProvider.currentWord = word;
                                       Navigator.of(context).pop();
                                       Navigator.of(context).pop();
