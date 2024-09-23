@@ -15,20 +15,50 @@ class _WordsBankPageState extends State<WordsBankPage> {
   final _formKey2 = GlobalKey<FormState>();
   String _english = '';
   String _hebrew = '';
+  String _searchQuery = '';
+  bool _isSearching = false;
 
   @override
   Widget build(BuildContext context) {
     var wordsProvider = Provider.of<WordsProvider>(context);
     var words = wordsProvider.words;
 
+    var filteredWords = _isSearching
+        ? words.where((word) => word.english.toLowerCase().contains(_searchQuery.toLowerCase()) || word.hebrew.contains(_searchQuery)).toList()
+        : words;
+
     return Scaffold(
       appBar: AppBar(
         iconTheme:
             IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
         backgroundColor: Theme.of(context).colorScheme.primary,
-        title: Text('Words',
-            style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
+        title: _isSearching
+            ? TextField(
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: 'Search...',
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                ),
+                style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
+              )
+            : Text('Words',
+                style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
         actions: [
+          IconButton(
+            icon: Icon(_isSearching ? Icons.clear : Icons.search),
+            onPressed: () {
+              setState(() {
+                _isSearching = !_isSearching;
+                _searchQuery = '';
+              });
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.sort_by_alpha),
             onPressed: () {
@@ -47,9 +77,9 @@ class _WordsBankPageState extends State<WordsBankPage> {
         children: [
           Expanded(
             child: ListView.separated(
-              itemCount: words.length,
+              itemCount: filteredWords.length,
               itemBuilder: (context, index) {
-                var word = words[index];
+                var word = filteredWords[index];
                 return ListTile(
                   title: Text(word.english),
                   subtitle: Text(word.hebrew),

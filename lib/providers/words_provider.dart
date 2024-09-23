@@ -107,7 +107,7 @@ class WordsProvider with ChangeNotifier {
       }
 
       if (_words.isEmpty) {
-        _words = defaultWords;
+        _words = nextQuizWords;
         _filteredWords = _words;
         saveWords();
       }
