@@ -37,10 +37,17 @@ class _WordsBankPageState extends State<WordsBankPage> {
                 autofocus: true,
                 decoration: InputDecoration(
                   hintText: 'Search...',
-                  border: InputBorder.none,
-                  hintStyle: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.secondaryContainer,
+                  hintStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.onSecondaryContainer),
+                      contentPadding: const EdgeInsets.all(6),
                 ),
-                style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSecondaryContainer),
                 onChanged: (value) {
                   setState(() {
                     _searchQuery = value;
